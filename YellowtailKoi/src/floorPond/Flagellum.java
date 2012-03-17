@@ -4,28 +4,25 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
 
-/*
+/**
 	Fish locomotion class
 	Logic from levitated.com, simulates wave propagation through a kinetic array of nodes
 	also some bits from flight404 blog
 */
 public class Flagellum
 {
-
 	private int numNodes = 16;
 	private float skinXspacing, skinYspacing;		  // store distance for vertex points that builds the shape
 	private float muscleRange = 6;					 // controls rotation angle of the neck
 	protected float muscleFreq;	 //
-	private float theta_vel;
 	protected float theta = 180;
-	private float theta_friction = 0.6f;
 	private float count = 0;
 
 	private Node[] node = new Node[numNodes];
 
 	private PImage skin;
 	private PApplet applet;
-
+	private boolean showFlagelumStructure = false;
 
 	Flagellum(PApplet applet, String _skin)
 	{
@@ -74,7 +71,15 @@ public class Flagellum
 
 	void display()
 	{
-		applet.noStroke();
+		if (showFlagelumStructure)
+		{
+			applet.stroke(255);
+			applet.strokeWeight(1);
+		}
+		else
+		{
+			applet.noStroke();
+		}
 		applet.beginShape(PConstants.QUAD_STRIP);
 		applet.texture(skin);
 		for (int n = 0; n < numNodes; n++)

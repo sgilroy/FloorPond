@@ -6,8 +6,6 @@ import processing.core.PImage;
 import processing.core.PVector;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -56,9 +54,16 @@ public class YellowtailKoi extends PApplet implements TuioListener
 	// and declare a TuioProcessing client variable
 	TuioProcessing tuioClient;
 
-	int numBoids = 3;
-	float BOID_DENSITY = 1.0f / 15681; // equivalent to 50 boids on a 1080x600 screen
-//	float BOID_DENSITY = -1;
+	/**
+	 * The maximum number of boids to use.
+	 */
+	int numBoids;
+	/**
+	 * Number of boids per pixel (boids = area * density). For example, 1.0f / 15681 is equivalent to 20 boids on a 640x480.
+	 * Specify -1 to
+	 */
+	float BOID_DENSITY = 1.0f / 15681;
+
 	int lastBirthTimecheck = 0;				// birth time interval
 	int addKoiCounter = 0;
 
@@ -95,6 +100,11 @@ public class YellowtailKoi extends PApplet implements TuioListener
 	WrappedView wrappedView;
 	private static final int IDLE_CURSOR_AUTOMATIC_DISPOSE_DELAY = 3000;
 	private static boolean fullScreen = false;
+	/**
+	 * If true, boids will wander aimlessly when now following a gesture; otherwise, boids will flock
+	 */
+	private static boolean useWanderBehavior = false;
+	private boolean useBrightnessToSimulateDepth = false;
 
 	public YellowtailKoi()
 	{
@@ -184,8 +194,6 @@ public class YellowtailKoi extends PApplet implements TuioListener
 			}
 		}
 
-		Vector tuioCursorList = tuioClient.getTuioCursors();
-
 		Hit ballLocation = sensor.readHit();
 		if (ballLocation != null)
 		{
@@ -209,7 +217,6 @@ public class YellowtailKoi extends PApplet implements TuioListener
 
 				if (gesture.exists)
 				{
-//    if (n < yellowtail.nGestures && yellowtail.gestureArray[n].exists) {
 					boid.startStrictPursuit();
 					Vec3f gesturePoint = gesture.path[gesture.nPoints - 1];
 
@@ -217,13 +224,8 @@ public class YellowtailKoi extends PApplet implements TuioListener
 //					println("Boid " + n + " at " + boid.location.x + ", " + boid.location.y + " pursuing yellowtail at " + targetPosition.x + ", " + targetPosition.y + "  based on " + gesturePoint.x + ", " + gesturePoint.y);
 					targetPosition = wrappedView.targetForWrapping(targetPosition, boid.location);
 
-
 //      println("  adjusted: " + targetPosition.x + ", " + targetPosition.y);
 
-//					float boidDist = dist(targetPosition.x, targetPosition.y, boid.location.x, boid.location.y);
-//      if (usePursuitAlgorithm) {
-//        if (boidDist > 5)
-//          boid.pursue(targetPosition);
 					boid.arrive(targetPosition);
 					boid.run();
 					boidHasGoal = true;
@@ -239,9 +241,9 @@ public class YellowtailKoi extends PApplet implements TuioListener
 				boolean shouldEvade = false;
 
 				// touch/bodies (TUIO)
-				for (int i = 0; i < tuioCursorList.size(); i++)
+				for (CursorGesture cursorGesture : tuioCursorMap.values())
 				{
-					TuioCursor tcur = (TuioCursor) tuioCursorList.elementAt(i);
+					TuioCursor tcur = cursorGesture.getCursor();
 
 					// for each tuio cursor, pick objects inside the mouseAvoidScope
 					// and convert them in pursuers
@@ -293,8 +295,14 @@ public class YellowtailKoi extends PApplet implements TuioListener
 					}
 				} else
 				{
-//					boid.wander();
-					boid.flock(boids);
+					if (useWanderBehavior)
+					{
+						boid.wander();
+					}
+					else
+					{
+						boid.flock(boids);
+					}
 				}
 				boid.run();
 			}
@@ -303,26 +311,14 @@ public class YellowtailKoi extends PApplet implements TuioListener
 		if (showTuioCursors)
 		{
 			// render the touch/bodies cursors (TUIO)
-//			for (int i = 0; i < tuioCursorList.size(); i++)
-//			{
 			for (CursorGesture cursorGesture : tuioCursorMap.values())
 			{
-//				TuioCursor tcur = (TuioCursor) tuioCursorList.elementAt(i);
 				TuioCursor tcur = cursorGesture.getCursor();
 
 				// for each tuio cursor, pick objects inside the mouseAvoidScope
 				// and convert them in pursuers
 				PVector cursorPosition = new PVector(tcur.getScreenX(width), tcur.getScreenY(height));
 
-/*
-				boolean shouldEvade = determineTuioCursorShouldEvade(tcur);
-				if (shouldEvade)
-				{
-					// red for evade
-					tint(255, 90, 90, 200);
-					stroke(255, 90, 90, 200);
-				}
-*/
 				noFill();
 				strokeWeight(3);
 				int age = cursorGesture.age(millis());
@@ -349,8 +345,6 @@ public class YellowtailKoi extends PApplet implements TuioListener
 					tint(255, 128);
 					stroke(255, 200);
 				}
-				//ellipse(hitPixels.x, hitPixels.y, CURSOR_CIRCLE_DIAMETER, CURSOR_CIRCLE_DIAMETER);
-//				tint(255, 128);
 				image(ripple, cursorPosition.x - (CURSOR_CIRCLE_DIAMETER / 2), cursorPosition.y - (CURSOR_CIRCLE_DIAMETER / 2),
 					  CURSOR_CIRCLE_DIAMETER, CURSOR_CIRCLE_DIAMETER);
 			}
@@ -397,10 +391,6 @@ public class YellowtailKoi extends PApplet implements TuioListener
 			refreshCanvas();
 			ripples.update();
 		}
-
-		//image(innerShadow, 0, 0);
-
-		//println("fps: " + frameRate);
 	}
 
 	private void drawChargeAnimation(PVector cursorPosition, float chargeAnimationPhase)
@@ -435,11 +425,7 @@ public class YellowtailKoi extends PApplet implements TuioListener
 	// Every other cursor is treated as something to evade or pursue
 	boolean determineTuioCursorShouldEvade(TuioCursor tcur)
 	{
-		boolean shouldEvade = (tcur.getSessionID() % 2 == 0);
-//  float speedSquared = tcur.getXSpeed() * tcur.getXSpeed() + tcur.getYSpeed() * tcur.getYSpeed();
-//  shouldEvade = (speedSquared > 1);
-//  println("TUIO cursor " + tcur.getSessionID() + " is moving at v * v = " + speedSquared);
-		return shouldEvade;
+		return (tcur.getSessionID() % 2 == 0);
 	}
 
 	// increments number of koi by 1
@@ -447,19 +433,18 @@ public class YellowtailKoi extends PApplet implements TuioListener
 	{
 		int id = (int) (random(minSkinIndex, maxSkinIndex + 1));
 		Boid boid = new Boid(this, skin[id],
-						  //new PVector(random(100, width - 100), random(100, height - 100)), random(0.8, 1.9), .5));
 						  new PVector(random(100, width - 100), random(100, height - 100)),
 						  random(BOID_SPEED_RANGE_MIN, BOID_SPEED_RANGE_MAX), BOID_MAX_FORCE,
 						  wrappedView);
 		boids.add(boid);
 		availableBoids.add(boid);
-		// sets opacity to simulate depth
-		boid.maxOpacity = (int) (map(addKoiCounter, 0, numBoids, 150, 255));
+		// sets brightness to simulate depth
+		if (useBrightnessToSimulateDepth)
+			boid.brightness = (int) (map(addKoiCounter, 0, numBoids, 150, 255));
 
 		addKoiCounter++;
 		return boid;
 	}
-
 
 	// use for the ripple effect to refresh the canvas
 	void refreshCanvas()
@@ -471,7 +456,6 @@ public class YellowtailKoi extends PApplet implements TuioListener
 
 	public void mousePressed()
 	{
-		//println(mouseX + " " + mouseY);
 		hitPixels = new PVector(mouseX, mouseY);
 		press = true;
 		pressTime = millis();

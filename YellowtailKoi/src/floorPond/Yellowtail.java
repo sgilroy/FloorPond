@@ -129,19 +129,19 @@ class Yellowtail
 	{
 		if (applet.key == '+' || applet.key == '=')
 		{
-			if (currentGestureId >= 0)
+			if (mouseGesture != null)
 			{
-				float th = gestureArray[currentGestureId].thickness;
-				gestureArray[currentGestureId].thickness = PApplet.min(96, th + 1);
-				gestureArray[currentGestureId].compile();
+				float th = mouseGesture.thickness;
+				mouseGesture.thickness = PApplet.min(96, th + 1);
+				mouseGesture.compile();
 			}
 		} else if (applet.key == '-')
 		{
-			if (currentGestureId >= 0)
+			if (mouseGesture != null)
 			{
-				float th = gestureArray[currentGestureId].thickness;
-				gestureArray[currentGestureId].thickness = PApplet.max(2, th - 1);
-				gestureArray[currentGestureId].compile();
+				float th = mouseGesture.thickness;
+				mouseGesture.thickness = PApplet.max(2, th - 1);
+				mouseGesture.compile();
 			}
 		} else if (applet.key == ' ')
 		{
@@ -152,7 +152,7 @@ class Yellowtail
 
 	void renderGesture(Gesture gesture)
 	{
-		if (gesture.exists)
+		if (gesture.exists && !gesture.isInvisible())
 		{
 			if (gesture.nPolys > 0)
 			{
@@ -165,6 +165,8 @@ class Yellowtail
 				int cr;
 
 				applet.fill(255, 255, 245, gesture.getAlpha());
+				// green for St. Patrick's Day
+//				applet.fill(14, 158, 73, gesture.getAlpha());
 				applet.beginShape(PConstants.QUADS);
 				int gnp = gesture.nPolys;
 				for (int i = 0; i < gnp; i++)
@@ -245,7 +247,7 @@ class Yellowtail
 			if (nPts > 0)
 			{
 				path = gesture.path;
-				for (int i = nPts1; moveForward ? i < nPts : i > 0; i+= (moveForward ? 1 : -1))
+				for (int i = nPts1; moveForward ? i < nPts - 1 : i > 0; i+= (moveForward ? 1 : -1))
 				{
 					path[i].x = path[i + (moveForward ? 1 : -1)].x;
 					path[i].y = path[i + (moveForward ? 1 : -1)].y;

@@ -40,6 +40,9 @@ public class Boid extends Flagellum
 	private float defaultMaxForce;
 	private final boolean showBoidTrajectories = false;
 
+	int opacity = 0;
+	int brightness = 255;
+
 	private Gesture gesture;
 
 	Boid(PApplet applet, String _skin, PVector _location, float _maxSpeed, float _maxForce, WrappedView _wrappedView)
@@ -220,20 +223,17 @@ public class Boid extends Flagellum
 		super.theta = goalThetaDegrees;
 	}
 
-	// control skin tint, for now it picks a random dark grey color
-	int opacity = 0;
-
-	int maxOpacity = 0;
-
 	void display()
 	{
 		if (opacity < 255) opacity += 1;
 		else opacity = 255;
-		applet.tint(maxOpacity, maxOpacity, maxOpacity, opacity);
+		applet.tint(brightness, brightness, brightness, opacity);
+		// green for St. Patrick's Day
+//		applet.tint(3, 255, 20, opacity);
 
 		applet.pushMatrix();
 		applet.translate(location.x, location.y);
-		//rotate(theta);
+		// we don't rotate(theta) because rotation is handled by the Flagellum theta
 		super.display();
 		applet.popMatrix();
 		applet.noTint();
@@ -255,10 +255,6 @@ public class Boid extends Flagellum
 	// wrapper, appear opposite side
 	void borders()
 	{
-//    if (location.x < -skin.width) location.x = applet.width;
-//    if (location.x > applet.width + skin.width) location.x = 0;
-//    if (location.y < -skin.width) location.y = applet.height;
-//    if (location.y > applet.height + skin.width) location.y = 0;
 		location.x = wrappedView.getViewX(location.x);
 		location.y = wrappedView.getViewY(location.y);
 	}

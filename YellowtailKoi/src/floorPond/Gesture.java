@@ -7,6 +7,8 @@ import java.awt.*;
 
 public class Gesture
 {
+	public static final int COMPLETE_GESTURE_ALPHA = 128;
+	public static final int INCOMPLETE_GESTURE_ALPHA = 255;
 	float damp = 5.0f;
 	float dampInv = 1.0f / damp;
 	float damp1 = damp - 1;
@@ -29,7 +31,10 @@ public class Gesture
 
 	long currentAge = 0;
 	//  long invisibleAge = 60 * 60 * 2;
-	long invisibleAge = 60 * 10;
+	/*
+	 * Number of frames (age) after which the gesture will be faded to invisible
+	 */
+	long invisibleAge = 60 * 30;
 	private boolean complete;
 
 	Gesture(int mw, int mh, WrappedView _wrappedView)
@@ -37,10 +42,6 @@ public class Gesture
 		w = mw;
 		h = mh;
 		wrappedView = _wrappedView;
-//    offScreenGutter = wrappedView.offScreenGutter;
-//    virtualW = w + offScreenGutter * 2;
-//    virtualH = h + offScreenGutter * 2;
-//    wrappedView = new WrappedView(w, h, offScreenGutter);
 
 		capacity = 600;
 		path = new Vec3f[capacity];
@@ -326,7 +327,7 @@ public class Gesture
 
 	int getAlpha()
 	{
-		return currentAge == 0 ? 255 : (int) PApplet.lerp(64, 0, (float) currentAge / invisibleAge);
+		return currentAge == 0 ? INCOMPLETE_GESTURE_ALPHA : (int) PApplet.lerp(COMPLETE_GESTURE_ALPHA, 0, (float) currentAge / invisibleAge);
 	}
 
 	boolean isInvisible()
