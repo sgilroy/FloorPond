@@ -1,0 +1,21 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="YellowtailKoi:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/YellowtailKoi_jar</output-path>
+    <root id="archive" name="YellowtailKoi.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/YellowtailKoi/src/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="YellowtailKoi" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/core.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/opengl.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/serial.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/TUIO.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/matrix.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/libTUIO.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/gluegen-rt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/jogl.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/RXTXcomm.jar" path-in-jar="/" />
+      <element id="dir-copy" path="$PROJECT_DIR$/YellowtailKoi/resources" />
+    </root>
+  </artifact>
+</component>
