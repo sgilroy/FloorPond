@@ -1,0 +1,20 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>floorPond.YellowtailKoi</groupId>
+	<artifactId>YellowtailKoi</artifactId>
+	<version>1</version>
+	<repositories>
+		<repository>
+			<id>java-twitter-repository</id>
+			<url>http://java-twitter.googlecode.com/svn/repository/</url>
+			<name>java-twitter maven repository</name>
+		</repository>
+	</repositories>
+	<dependencies>
+		<dependency>
+			<groupId>net.unto.twitter</groupId>
+			<artifactId>java-twitter</artifactId>
+			<version>0.9-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+</project>

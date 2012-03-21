@@ -106,6 +106,9 @@ public class YellowtailKoi extends PApplet implements TuioListener
 	private static boolean useWanderBehavior = false;
 	private boolean useBrightnessToSimulateDepth = false;
 
+	private TextParade textParade;
+	private TwitterReader twitterReader;
+
 	public YellowtailKoi()
 	{
 
@@ -167,6 +170,10 @@ public class YellowtailKoi extends PApplet implements TuioListener
 		// since we add "this" class as an argument the TuioProcessing class expects
 		// an implementation of the TUIO callback methods (see below)
 		tuioClient = new TuioProcessing(this);
+
+		textParade = new TextParade(this);
+		twitterReader = new TwitterReader();
+		textParade.addMessages(twitterReader.update());
 	}
 
 	boolean pause = false;
@@ -175,6 +182,8 @@ public class YellowtailKoi extends PApplet implements TuioListener
 
 	public void draw()
 	{
+		textParade.addMessages(twitterReader.update());
+
 		if (advanceOneFrame)
 			advanceOneFrame = false;
 		else if (pause)
@@ -391,6 +400,8 @@ public class YellowtailKoi extends PApplet implements TuioListener
 			refreshCanvas();
 			ripples.update();
 		}
+
+		textParade.draw();
 	}
 
 	private void drawChargeAnimation(PVector cursorPosition, float chargeAnimationPhase)
