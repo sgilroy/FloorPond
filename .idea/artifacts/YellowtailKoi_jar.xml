@@ -16,6 +16,31 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/jogl.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/RXTXcomm.jar" path-in-jar="/" />
       <element id="dir-copy" path="$PROJECT_DIR$/YellowtailKoi/resources" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/commons-beanutils-1.7.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/commons-cli-1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/commons-codec-1.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/commons-collections-3.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/commons-httpclient-3.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/commons-io-1.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/commons-lang-2.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/commons-logging-1.0.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/doxia-sink-api-1.0-alpha-7.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/ezmorph-1.0.6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/google-collections-0.9.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/java-twitter-0.9-SNAPSHOT.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/joda-time-1.6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/json-lib-2.2.3-jdk15.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/junit-3.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/plexus-build-api-0.0.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/plexus-compiler-api-1.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/plexus-compiler-javac-1.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/plexus-compiler-manager-1.8.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/plexus-interactivity-api-1.0-alpha-4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/plexus-interpolation-1.13.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/plexus-interpolation-1.6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/plexus-utils-1.5.6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/plexus-utils-2.0.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/YellowtailKoi/libs/protobuf-java-2.2.0.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
