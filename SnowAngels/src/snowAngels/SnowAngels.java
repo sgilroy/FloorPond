@@ -15,10 +15,10 @@ public class SnowAngels extends PApplet
 
 	private static boolean fullScreen;
 	int fadeCycle = 0;
-	int fadeDelay = 20;
+	int fadeDelay = 60;
 	int fadeAmount = 10;
 	private int lastActiveTime = 0;
-	private static final int DORMANT_DELAY = 5000;
+	private static final int DORMANT_DELAY = 200;
 	PImage imageBuffer;
 	private boolean shouldFade = true;
 	private boolean shouldBlur = true;
@@ -85,7 +85,7 @@ public class SnowAngels extends PApplet
 					activePeople = true;
 					
 					int color = colorTable.get(person.id % colorTable.size());
-					fill(hue(color), (int)(saturation(color) * saturationFactor), brightness(color) / 2, 64);
+					fill(hue(color), (int)(saturation(color) * saturationFactor), (int)(brightness(color) * 0.8), 64);
 					stroke(hue(color), (int)(saturation(color) * saturationFactor), saturationFactor == 0 ? 255 : brightness(color), 255);
 					strokeWeight(strokeWeight);
 					beginShape();
@@ -104,8 +104,8 @@ public class SnowAngels extends PApplet
 		if (PARAMETER_RANDOMIZATION_DELAY != -1 && millis() - lastParameterRandomization > PARAMETER_RANDOMIZATION_DELAY)
 		{
 			lastParameterRandomization = millis();
-			blurRadius = (random(1f) > 0.5f) ? 0 : random(0, 10);
-			fadeAmount = (random(1f) > 0.5f) ? 0 : (int) random(0, 10);
+			blurRadius = (random(1f) > 0.5f) ? 0 : random(0, 3);
+			fadeAmount = (blurRadius > 0 || random(1f) > 0.5f) ? 0 : (int) random(0, 10);
 			saturationFactor = (random(1f) > 0.5f) ? 0 : random(0, 1);
 			strokeWeight = random(0, 5);
 		}
