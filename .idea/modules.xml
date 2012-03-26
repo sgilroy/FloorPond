@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MyProcessingSketch/MyProcessingSketch.iml" filepath="$PROJECT_DIR$/MyProcessingSketch/MyProcessingSketch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SimpleTSPSCatcher_UI/SimpleTSPSCatcher_UI.iml" filepath="$PROJECT_DIR$/SimpleTSPSCatcher_UI/SimpleTSPSCatcher_UI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SnowAngels/SnowAngels.iml" filepath="$PROJECT_DIR$/SnowAngels/SnowAngels.iml" />
       <module fileurl="file://$PROJECT_DIR$/YellowtailKoi/YellowtailKoi.iml" filepath="$PROJECT_DIR$/YellowtailKoi/YellowtailKoi.iml" />
     </modules>
   </component>

@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="TSPS">
+    <CLASSES>
+      <root url="file://$TSPS_HOME$/library" />
+      <root url="file://$TSPS_HOME$/library" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="file://$TSPS_HOME$/reference" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="file://$TSPS_HOME$/src" />
+    </SOURCES>
+    <jarDirectory url="file://$TSPS_HOME$/library" recursive="false" />
+  </library>
+</component>

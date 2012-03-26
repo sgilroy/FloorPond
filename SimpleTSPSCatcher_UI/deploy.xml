@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SimpleTSPSCatcher_UI" basedir="." default="deploy">
+	<description description="Copy binaries to Interplay"/>
+	<property file="local.properties" />
+	<property file="deploy.properties" />
+
+	<target name="deploy">
+		<property name="deploy.destination" location="${deploy.demo-binaries.dir}/${ant.project.name}"/>
+		<mkdir dir="${deploy.destination}"/>
+		<copy todir="${deploy.destination}">
+			<fileset dir="${artifacts.dir}/${ant.project.name}_jar"/>
+		</copy>
+	</target>
+</project>

@@ -1,6 +1,12 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="YellowtailKoi:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/YellowtailKoi_jar</output-path>
+    <properties id="ant-postprocessing">
+      <options enabled="true">
+        <file>file://$PROJECT_DIR$/YellowtailKoi/deploy.xml</file>
+        <target>deploy</target>
+      </options>
+    </properties>
     <root id="archive" name="YellowtailKoi.jar">
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/YellowtailKoi/src/META-INF/MANIFEST.MF" />

@@ -1,0 +1,20 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SnowAngels:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SnowAngels_jar</output-path>
+    <properties id="ant-postprocessing">
+      <options enabled="true">
+        <file>file://$PROJECT_DIR$/SnowAngels/deploy.xml</file>
+        <target>deploy</target>
+      </options>
+    </properties>
+    <root id="archive" name="SnowAngels.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/SnowAngels/src/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="SnowAngels" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/SnowAngels/libs/core.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/SnowAngels/libs/oscP5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/SnowAngels/libs/TSPS.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

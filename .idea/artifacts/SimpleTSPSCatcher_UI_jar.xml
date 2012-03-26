@@ -1,0 +1,21 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SimpleTSPSCatcher_UI:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SimpleTSPSCatcher_UI_jar</output-path>
+    <properties id="ant-postprocessing">
+      <options enabled="true">
+        <file>file://$PROJECT_DIR$/SimpleTSPSCatcher_UI/deploy.xml</file>
+        <target>deploy</target>
+      </options>
+    </properties>
+    <root id="archive" name="SimpleTSPSCatcher_UI.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/SimpleTSPSCatcher_UI/src/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="SimpleTSPSCatcher_UI" />
+      <element id="extracted-dir" path="$TSPS_HOME$/library/TSPS.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$TSPS_HOME$/library/oscP5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$TSPS_HOME$/library/core.jar" path-in-jar="/" />
+      <element id="dir-copy" path="$PROJECT_DIR$/SimpleTSPSCatcher_UI/resources" />
+    </root>
+  </artifact>
+</component>

@@ -101,12 +101,12 @@ public class YellowtailKoi extends PApplet implements TuioListener
 	private static final int IDLE_CURSOR_AUTOMATIC_DISPOSE_DELAY = 3000;
 	private static boolean fullScreen = false;
 	/**
-	 * If true, boids will wander aimlessly when now following a gesture; otherwise, boids will flock
+	 * If true, boids will wander aimlessly when not following a gesture; otherwise, boids will flock
 	 */
 	private static boolean useWanderBehavior = false;
 	private boolean useBrightnessToSimulateDepth = false;
 
-	private boolean showTweets = true;
+	private boolean showTweets = false;
 	private TextParade textParade;
 	private TwitterReader twitterReader;
 
