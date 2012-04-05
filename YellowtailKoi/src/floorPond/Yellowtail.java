@@ -47,7 +47,7 @@ class Yellowtail
 		gestureArray = new Gesture[nGestures];
 		for (int i = 0; i < nGestures; i++)
 		{
-			gestureArray[i] = new Gesture(applet.width, applet.height, wrappedView);
+			gestureArray[i] = new Gesture(applet.width, applet.height, wrappedView, applet);
 			availableGestures.add(gestureArray[i]);
 		}
 		clearGestures();
@@ -246,16 +246,18 @@ class Yellowtail
 
 			if (nPts > 0)
 			{
-				path = gesture.path;
-				for (int i = nPts1; moveForward ? i < nPts - 1 : i > 0; i+= (moveForward ? 1 : -1))
+				if (gesture.startAdvance())
 				{
-					path[i].x = path[i + (moveForward ? 1 : -1)].x;
-					path[i].y = path[i + (moveForward ? 1 : -1)].y;
+					path = gesture.path;
+					for (int i = nPts1; moveForward ? i < nPts - 1 : i > 0; i+= (moveForward ? 1 : -1))
+					{
+						path[i].x = path[i + (moveForward ? 1 : -1)].x;
+						path[i].y = path[i + (moveForward ? 1 : -1)].y;
+					}
+					path[moveForward ? nPts - 1 : 0].x = path[nPts1].x + jx;
+					path[moveForward ? nPts - 1 : 0].y = path[nPts1].y + jy;
+					gesture.compile();
 				}
-				path[moveForward ? nPts - 1 : 0].x = path[nPts1].x + jx;
-				path[moveForward ? nPts - 1 : 0].y = path[nPts1].y + jy;
-				gesture.compile();
-				gesture.currentAge++;
 			}
 		}
 	}

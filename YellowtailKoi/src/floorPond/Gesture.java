@@ -20,6 +20,7 @@ public class Gesture
 	Vec3f path[];
 	int crosses[];
 	Polygon polygons[];
+	int advanceTimes[];
 	int nPoints;
 	int nPolys;
 
@@ -28,31 +29,39 @@ public class Gesture
 	float INIT_TH = 14;
 	float thickness = INIT_TH;
 	WrappedView wrappedView;
+	private PApplet applet;
 
-	long currentAge = 0;
+	//	private long currentAge = 0;
 	//  long invisibleAge = 60 * 60 * 2;
 	/*
 	 * Number of frames (age) after which the gesture will be faded to invisible
 	 */
-	long invisibleAge = 60 * 30;
+	long invisibleAge = 1000 * 60 * 5;
 	private boolean complete;
+	private int birthTime = -1;
+	private int advanceIndex = 0;
+	private int advanceRestarts = 0;
+	private int clearTime;
 
-	Gesture(int mw, int mh, WrappedView _wrappedView)
+	Gesture(int mw, int mh, WrappedView _wrappedView, PApplet applet)
 	{
 		w = mw;
 		h = mh;
 		wrappedView = _wrappedView;
+		this.applet = applet;
 
 		capacity = 600;
 		path = new Vec3f[capacity];
 		polygons = new Polygon[capacity];
 		crosses = new int[capacity];
+		advanceTimes = new int[capacity];
 		for (int i = 0; i < capacity; i++)
 		{
 			polygons[i] = new Polygon();
 			polygons[i].npoints = 4;
 			path[i] = new Vec3f();
 			crosses[i] = 0;
+			advanceTimes[i] = 0;
 		}
 		nPoints = 0;
 		nPolys = 0;
@@ -60,6 +69,8 @@ public class Gesture
 		exists = false;
 		jumpDx = 0;
 		jumpDy = 0;
+
+		initializeGestureTimes();
 	}
 
 	void clear()
@@ -67,8 +78,21 @@ public class Gesture
 		nPoints = 0;
 		exists = false;
 		thickness = INIT_TH;
-		currentAge = 0;
+		initializeGestureTimes();
+		advanceIndex = 0;
+		advanceRestarts = 0;
 		complete = false;
+	}
+
+	private void initializeGestureTimes()
+	{
+		setBirthTime(-1);
+		clearTime = applet.millis();
+	}
+
+	private void setBirthTime(int now)
+	{
+		birthTime = now;
 	}
 
 	void clearPolys()
@@ -85,6 +109,8 @@ public class Gesture
 			// but for abject simplicity, I don't do anything.
 		} else
 		{
+			advanceTimes[nPoints] = applet.millis() - clearTime;
+
 			float v = distToLast(x, y);
 			float p = getPressureFromVelocity(v);
 			path[nPoints++].set(x, y, p);
@@ -327,21 +353,48 @@ public class Gesture
 
 	int getAlpha()
 	{
-		return currentAge == 0 ? INCOMPLETE_GESTURE_ALPHA : (int) PApplet.lerp(COMPLETE_GESTURE_ALPHA, 0, (float) currentAge / invisibleAge);
+		return getCurrentAge() == 0 ? INCOMPLETE_GESTURE_ALPHA : (int) PApplet.lerp(COMPLETE_GESTURE_ALPHA, 0, (float) getCurrentAge() / invisibleAge);
 	}
 
 	boolean isInvisible()
 	{
-		return currentAge >= invisibleAge;
+		return getCurrentAge() >= invisibleAge;
 	}
 
 	public void end()
 	{
 		complete = true;
+		setBirthTime(applet.millis());
 	}
 
 	public boolean isComplete()
 	{
 		return complete;
+	}
+
+	public int getCurrentAge()
+	{
+		return birthTime == -1 ? 0 : applet.millis() - birthTime;
+	}
+
+	public boolean startAdvance()
+	{
+		int remainderAge = getCurrentAge() - (getRestartAge() * advanceRestarts);
+		if (remainderAge >= advanceTimes[advanceIndex])
+		{
+			advanceIndex++;
+			if (advanceIndex >= nPoints)
+			{
+				advanceIndex = 0;
+				advanceRestarts++;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	public int getRestartAge()
+	{
+		return advanceTimes[nPoints - 1];
 	}
 }

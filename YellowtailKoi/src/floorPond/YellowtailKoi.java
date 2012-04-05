@@ -457,8 +457,9 @@ public class YellowtailKoi extends PApplet implements TuioListener
 						  new PVector(random(100, width - 100), random(100, height - 100)),
 						  random(BOID_SPEED_RANGE_MIN, BOID_SPEED_RANGE_MAX), BOID_MAX_FORCE,
 						  wrappedView);
+		// put the new boid at the front of the stack so that it will get picked first
 		boids.add(boid);
-		availableBoids.add(boid);
+		availableBoids.add(0, boid);
 		// sets brightness to simulate depth
 		if (useBrightnessToSimulateDepth)
 			boid.brightness = (int) (map(addKoiCounter, 0, numBoids, 150, 255));

@@ -1,6 +1,7 @@
 package snowAngels;
 
 import processing.core.PApplet;
+import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PVector;
 import tsps.TSPS;
@@ -11,24 +12,33 @@ import java.util.ArrayList;
 public class SnowAngels extends PApplet
 {
 	public static final String APPLET_CLASS = "snowAngels.SnowAngels";
+	public static final String PROCESSING_RENDERER = P2D;
 	TSPS tspsReceiver;
 
 	private static boolean fullScreen;
 	int fadeCycle = 0;
 	int fadeDelay = 60;
-	int fadeAmount = 10;
+	int fadeAmount = 0;
 	private int lastActiveTime = 0;
 	private static final int DORMANT_DELAY = 200;
 	PImage imageBuffer;
+	PGraphics mainGraphics;
 	private boolean shouldFade = true;
 	private boolean shouldBlur = true;
 	private ArrayList<Integer> colorTable = new ArrayList<Integer>();
-	private float blurRadius = 0f;
+	private float blurRadius = 0.1f;
 	
-	private static final int PARAMETER_RANDOMIZATION_DELAY = 5000;
+	private static final int PARAMETER_RANDOMIZATION_DELAY = 10000;
 	private int lastParameterRandomization = 0;
 	private float saturationFactor = 1f;
-	private float strokeWeight = 3f;
+	private float strokeWeight = 1f;
+
+	private SnowballBuilder snowballBuilder;
+
+	/**
+	 * Copy of the frame buffer before non-persistent overlay rendering is added
+	 */
+	private PImage persistentImage;
 
 	public static void main(String args[])
 	{
@@ -46,14 +56,16 @@ public class SnowAngels extends PApplet
 	{
 		if (fullScreen)
 		{
-			size(screen.width, screen.height, P2D);
+			size(screen.width, screen.height, PROCESSING_RENDERER);
 		} else
 		{
-			size(1024, 768, P2D);
+			size(1024, 768, PROCESSING_RENDERER);
 		}
 
 		//all you need to do to start TSPS
 		tspsReceiver = new TSPS(this, 12000);
+
+		snowballBuilder = new SnowballBuilder(this, tspsReceiver);
 
 		smooth();
 		background(0);
@@ -65,38 +77,42 @@ public class SnowAngels extends PApplet
 			colorTable.add(c);
 		}
 
-		imageBuffer = g.get();
+//		mainGraphics = createGraphics(width, height, PROCESSING_RENDERER);
+		mainGraphics = this.g;
+		mainGraphics.background(0);
+		mainGraphics.smooth();
+		mainGraphics.colorMode(HSB, 255);
+		imageBuffer = mainGraphics.get();
 	}
 
 	public void draw()
 	{
 		tspsReceiver.update();
+		snowballBuilder.update();
 
+//		mainGraphics.beginDraw();
+		mainGraphics.colorMode(HSB, 255);
+		mainGraphics.smooth();
+		if (persistentImage != null)
+		{
+			mainGraphics.image(persistentImage, 0, 0);
+		}
 		applyEffects();
 
-		boolean activePeople = false;
-		synchronized (tspsReceiver.people)
+		boolean activePeople = drawPeople(16, 34);
+
+//		mainGraphics.endDraw();
+
+		if (mainGraphics != g)
 		{
-			for (TSPSPerson person : tspsReceiver.people.values())
-			{
-				ArrayList<PVector> contours = person.contours;
-				if (contours.size() > 3)
-				{
-					activePeople = true;
-					
-					int color = colorTable.get(person.id % colorTable.size());
-					fill(hue(color), (int)(saturation(color) * saturationFactor), (int)(brightness(color) * 0.8), 64);
-					stroke(hue(color), (int)(saturation(color) * saturationFactor), saturationFactor == 0 ? 255 : brightness(color), 255);
-					strokeWeight(strokeWeight);
-					beginShape();
-					for (PVector point : contours)
-					{
-						curveVertex(point.x * width, point.y * height);
-					}
-					endShape(CLOSE);
-				}
-			}
+			image(mainGraphics, 0, 0, width, height);
 		}
+		else
+		{
+			persistentImage = mainGraphics.get();
+		}
+
+		drawPeople(255, 255);
 
 		if (activePeople)
 			lastActiveTime = millis();
@@ -104,11 +120,62 @@ public class SnowAngels extends PApplet
 		if (PARAMETER_RANDOMIZATION_DELAY != -1 && millis() - lastParameterRandomization > PARAMETER_RANDOMIZATION_DELAY)
 		{
 			lastParameterRandomization = millis();
-			blurRadius = (random(1f) > 0.5f) ? 0 : random(0, 3);
-			fadeAmount = (blurRadius > 0 || random(1f) > 0.5f) ? 0 : (int) random(0, 10);
-			saturationFactor = (random(1f) > 0.5f) ? 0 : random(0, 1);
-			strokeWeight = random(0, 5);
+			randomizeRenderingParameters();
 		}
+
+		snowballBuilder.draw();
+	}
+
+	private void randomizeRenderingParameters()
+	{
+		blurRadius = (random(1f) > 0.5f) ? 0 : random(0, 0.3f);
+		fadeAmount = (blurRadius > 0 || random(1f) > 0.5f) ? 0 : (int) random(0, 5);
+		saturationFactor = (random(1f) > 0.5f) ? 0 : random(0, 1);
+//		strokeWeight = random(1) > 0.5f ? 0 : random(0, 3);
+	}
+
+	private boolean drawPeople(int fillAlpha, int strokeAlpha)
+	{
+		boolean activePeople = false;
+		synchronized (tspsReceiver.people)
+		{
+			for (TSPSPerson person : tspsReceiver.people.values())
+			{
+				synchronized (person.contours)
+				{
+					ArrayList<PVector> contours = person.contours;
+					if (contours.size() > 3)
+					{
+						activePeople = true;
+
+						int color = getPersonColor(person);
+						mainGraphics.fill(hue(color), saturation(color), (int) (brightness(color) * 0.8), fillAlpha);
+						mainGraphics.stroke(hue(color), (int)(saturation(color) * saturationFactor), saturationFactor == 0 ? 255 : brightness(color),
+											strokeAlpha);
+						mainGraphics.strokeWeight(strokeWeight);
+						drawContours(contours);
+					}
+				}
+			}
+		}
+		return activePeople;
+	}
+
+	private int getPersonColor(TSPSPerson person)
+	{
+		return colorTable.get(person.id % colorTable.size());
+	}
+
+	private void drawContours(ArrayList<PVector> contours)
+	{
+		mainGraphics.beginShape();
+		for (PVector point : contours)
+		{
+			mainGraphics.curveVertex(point.x * width, point.y * height);
+		}
+//						PVector point = contours.get(0);
+//						mainGraphics.curveVertex(point.x * width, point.y * height);
+		mainGraphics.endShape(CLOSE);
 	}
 
 	private void applyEffects()
@@ -123,21 +190,23 @@ public class SnowAngels extends PApplet
 				// Fade out the surface slowly over time
 				if (shouldFade)
 				{
-					stroke(0);
-					strokeWeight(0);
-					fill(0, fadeAmount);
-					rect(0, 0, width, height);
+					mainGraphics.stroke(0);
+					mainGraphics.strokeWeight(0);
+					mainGraphics.fill(0, fadeAmount);
+					mainGraphics.rect(0, 0, width, height);
 				}
 
 			}
 			if (shouldBlur)
 			{
-				loadPixels(); //copy window contents -> pixels[]==g.pixels[]
-				fastSmallBlur(g, imageBuffer
+				//loadPixels(); //copy window contents -> pixels[]==g.pixels[]
+				mainGraphics.loadPixels();
+				fastSmallBlur(mainGraphics, imageBuffer
 						, blurRadius
 						, blurRadius
 				); //g=PImage of main window
-				image(imageBuffer, 0, 0); //draw results;
+				imageBuffer.updatePixels();
+				mainGraphics.image(imageBuffer, 0, 0); //draw results;
 			}
 		}
 	}
