@@ -34,9 +34,11 @@ public class Gesture
 	//	private long currentAge = 0;
 	//  long invisibleAge = 60 * 60 * 2;
 	/*
-	 * Number of frames (age) after which the gesture will be faded to invisible
+	 * Time (in milliseconds) after which the gesture will be faded to invisible. -1 means no fading of gestures (they
+	 * remain visible forever).
 	 */
-	long invisibleAge = 1000 * 60 * 5;
+//	long invisibleAge = 1000 * 60 * 5;
+	long invisibleAge = -1;
 	private boolean complete;
 	private int birthTime = -1;
 	private int advanceIndex = 0;
@@ -353,12 +355,17 @@ public class Gesture
 
 	int getAlpha()
 	{
-		return getCurrentAge() == 0 ? INCOMPLETE_GESTURE_ALPHA : (int) PApplet.lerp(COMPLETE_GESTURE_ALPHA, 0, (float) getCurrentAge() / invisibleAge);
+		if (getCurrentAge() == 0)
+			return INCOMPLETE_GESTURE_ALPHA;
+		else if (invisibleAge == -1)
+			return COMPLETE_GESTURE_ALPHA;
+		else
+			return (int) PApplet.lerp(COMPLETE_GESTURE_ALPHA, 0, (float) getCurrentAge() / invisibleAge);
 	}
 
 	boolean isInvisible()
 	{
-		return getCurrentAge() >= invisibleAge;
+		return invisibleAge != -1 && getCurrentAge() >= invisibleAge;
 	}
 
 	public void end()
