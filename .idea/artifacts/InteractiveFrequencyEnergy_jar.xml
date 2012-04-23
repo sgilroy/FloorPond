@@ -1,0 +1,29 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="InteractiveFrequencyEnergy:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/InteractiveFrequencyEnergy_jar</output-path>
+    <properties id="ant-postprocessing">
+      <options enabled="true">
+        <file>file://$PROJECT_DIR$/InteractiveFrequencyEnergy/deploy.xml</file>
+        <target>deploy</target>
+      </options>
+    </properties>
+    <root id="archive" name="InteractiveFrequencyEnergy.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/InteractiveFrequencyEnergy/src/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="InteractiveFrequencyEnergy" />
+      <element id="extracted-dir" path="C:/Program Files (x86)/processing-1.5.1/lib/core.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$TSPS_HOME$/library/oscP5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$TSPS_HOME$/library/TSPS.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/InteractiveFrequencyEnergy/libs/FrequencyEnergy.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/InteractiveFrequencyEnergy/libs/jl1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/InteractiveFrequencyEnergy/libs/jsminim.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/InteractiveFrequencyEnergy/libs/minim.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/InteractiveFrequencyEnergy/libs/minim-spi.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/InteractiveFrequencyEnergy/libs/mp3spi1.9.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/InteractiveFrequencyEnergy/libs/tritonus_aos.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/InteractiveFrequencyEnergy/libs/tritonus_share.jar" path-in-jar="/" />
+      <element id="dir-copy" path="$PROJECT_DIR$/InteractiveFrequencyEnergy/resources" />
+    </root>
+  </artifact>
+</component>
