@@ -15,6 +15,7 @@
       <element id="extracted-dir" path="$TSPS_HOME$/library/oscP5.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$TSPS_HOME$/library/TSPS.jar" path-in-jar="/" />
       <element id="extracted-dir" path="C:/Program Files (x86)/processing-1.5.1/lib/core.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/SnowAngels/libs/JSAP-2.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

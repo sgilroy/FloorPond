@@ -1,5 +1,6 @@
 package snowAngels;
 
+import com.martiansoftware.jsap.*;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
@@ -27,7 +28,7 @@ public class SnowAngels extends PApplet
 	private boolean shouldBlur = true;
 	private ArrayList<Integer> colorTable = new ArrayList<Integer>();
 	private float blurRadius = 0.1f;
-	
+
 	private static final int PARAMETER_RANDOMIZATION_DELAY = 10000;
 	private int lastParameterRandomization = 0;
 	private float saturationFactor = 1f;
@@ -39,12 +40,41 @@ public class SnowAngels extends PApplet
 	 * Copy of the frame buffer before non-persistent overlay rendering is added
 	 */
 	private PImage persistentImage;
+	private static int _fillAlpha = 16;
+	private static int _strokeAlpha = 34;
 
 	public static void main(String args[])
 	{
-		if (args.length > 0 && args[0].equals("--present"))
+		SimpleJSAP jsap = null;
+		try
 		{
-			fullScreen = true;
+			jsap = new SimpleJSAP(
+					"SnowAngels",
+					"Draws contours of people as they move",
+					new Parameter[]{
+							new FlaggedOption("fillAlpha", JSAP.INTEGER_PARSER, Integer.toString(_fillAlpha), JSAP.NOT_REQUIRED, 'f', JSAP.NO_LONGFLAG,
+											  "Alpha value for fills. Range is 0 to 255."),
+							new FlaggedOption("strokeAlpha", JSAP.INTEGER_PARSER, Integer.toString(_strokeAlpha), JSAP.NOT_REQUIRED, 's', JSAP.NO_LONGFLAG,
+											  "Alpha value for stroke (outline). Range is 0 to 255."),
+							new QualifiedSwitch("present", JSAP.BOOLEAN_PARSER, JSAP.NO_DEFAULT, JSAP.NOT_REQUIRED, 'p',
+												"present",
+												"Present full screen."),
+					}
+			);
+		} catch (JSAPException e)
+		{
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+
+		JSAPResult config = jsap.parse(args);
+		if (jsap.messagePrinted()) System.exit(1);
+
+		fullScreen = config.getBoolean("present");
+		_fillAlpha = config.getInt("fillAlpha");
+		_strokeAlpha = config.getInt("strokeAlpha");
+
+		if (fullScreen)
+		{
 			PApplet.main(new String[]{"--present", APPLET_CLASS});
 		} else
 		{
@@ -99,15 +129,14 @@ public class SnowAngels extends PApplet
 		}
 		applyEffects();
 
-		boolean activePeople = drawPeople(16, 34);
+		boolean activePeople = drawPeople(_fillAlpha, _strokeAlpha);
 
 //		mainGraphics.endDraw();
 
 		if (mainGraphics != g)
 		{
 			image(mainGraphics, 0, 0, width, height);
-		}
-		else
+		} else
 		{
 			persistentImage = mainGraphics.get();
 		}
@@ -150,7 +179,8 @@ public class SnowAngels extends PApplet
 
 						int color = getPersonColor(person);
 						mainGraphics.fill(hue(color), saturation(color), (int) (brightness(color) * 0.8), fillAlpha);
-						mainGraphics.stroke(hue(color), (int)(saturation(color) * saturationFactor), saturationFactor == 0 ? 255 : brightness(color),
+						mainGraphics.stroke(hue(color), (int) (saturation(color) * saturationFactor),
+											saturationFactor == 0 ? 255 : brightness(color),
 											strokeAlpha);
 						mainGraphics.strokeWeight(strokeWeight);
 						drawContours(contours);
@@ -223,11 +253,11 @@ public class SnowAngels extends PApplet
 	 * Small: Available only in 1 pixel radius
 	 * Shitty: Rounding errors make image dark soon
 	 * What happens:
-	 *    11111100 11111100 11111100 11111100 = mask == FF-3 = FCFCFCFC
-	 *    AAAAAAAA RRRRRRRR GGGGGGGG BBBBBBBB = PImage.pixel[i]
-	 *    AAAAAA00 RRRRRR00 GGGGGG00 BBBBBB00 = masked pixel
+	 * 11111100 11111100 11111100 11111100 = mask == FF-3 = FCFCFCFC
+	 * AAAAAAAA RRRRRRRR GGGGGGGG BBBBBBBB = PImage.pixel[i]
+	 * AAAAAA00 RRRRRR00 GGGGGG00 BBBBBB00 = masked pixel
 	 * AA AAAAAARR RRRRRRGG GGGGGGBB BBBBBB00 = sum of four masked pixel, alpha overflows, who cares
-	 *    00AAAAAA RRRRRRRR GGGGGGGG BBBBBBBB 00 = shift results to right -> broken alpha, good RGB (rounded down) averages
+	 * 00AAAAAA RRRRRRRR GGGGGGGG BBBBBBBB 00 = shift results to right -> broken alpha, good RGB (rounded down) averages
 	 */
 	void fastSmallBlur(PImage a, PImage b, float hradius, float vradius)
 	{
