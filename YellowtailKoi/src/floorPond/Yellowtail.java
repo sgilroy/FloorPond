@@ -57,6 +57,11 @@ class Yellowtail
 	void draw()
 	{
 		updateGeometry();
+		display();
+	}
+
+	public void display()
+	{
 		//fill(255, 255, 245, 64);
 		applet.noStroke();
 		for (int i = 0; i < nGestures; i++)

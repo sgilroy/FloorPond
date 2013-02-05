@@ -19,7 +19,7 @@
         <jarDirectory url="file://$MODULE_DIR$/libs" recursive="false" />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="processing" level="application" />
+    <orderEntry type="library" name="processing-1.5.1" level="application" />
   </component>
 </module>
 

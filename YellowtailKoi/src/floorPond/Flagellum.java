@@ -22,7 +22,7 @@ public class Flagellum
 
 	private PImage skin;
 	private PApplet applet;
-	private boolean showFlagelumStructure = false;
+	private boolean flagellumStructureVisible = false;
 
 	Flagellum(PApplet applet, String _skin)
 	{
@@ -71,7 +71,7 @@ public class Flagellum
 
 	void display()
 	{
-		if (showFlagelumStructure)
+		if (flagellumStructureVisible)
 		{
 			applet.stroke(255);
 			applet.strokeWeight(1);
@@ -105,5 +105,15 @@ public class Flagellum
 			applet.vertex(x2, y2, u, skin.height);
 		}
 		applet.endShape();
+	}
+
+	public boolean isFlagellumStructureVisible()
+	{
+		return flagellumStructureVisible;
+	}
+
+	public void setFlagellumStructureVisible(boolean flagellumStructureVisible)
+	{
+		this.flagellumStructureVisible = flagellumStructureVisible;
 	}
 }

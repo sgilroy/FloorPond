@@ -109,6 +109,7 @@ public class YellowtailKoi extends PApplet implements TuioListener
 	private boolean showTweets = false;
 	private TextParade textParade;
 	private TwitterReader twitterReader;
+	private boolean flagellumStructureVisible;
 
 	public YellowtailKoi()
 	{
@@ -191,16 +192,17 @@ public class YellowtailKoi extends PApplet implements TuioListener
 			textParade.addMessages(twitterReader.update());
 		}
 
+		boolean shouldUpdate = true;
 		if (advanceOneFrame)
 			advanceOneFrame = false;
 		else if (pause)
-			return;
+			shouldUpdate = false;
 
 		updateCursors();
 
 		background(0);
 
-		if (automaticBoidBirths)
+		if (shouldUpdate && automaticBoidBirths)
 		{
 			// adds new koi on a interval of time
 			if (millis() > lastBirthTimecheck + 200)
@@ -227,100 +229,107 @@ public class YellowtailKoi extends PApplet implements TuioListener
 			Boid boid = boids.get(n);
 			boolean boidHasGoal = false;
 
-			if (boid.getGesture() != null)
+			if (shouldUpdate)
 			{
-				Gesture gesture = boid.getGesture();
-
-				if (gesture.exists)
+				if (boid.getGesture() != null)
 				{
-					boid.startStrictPursuit();
-					Vec3f gesturePoint = gesture.path[gesture.nPoints - 1];
+					Gesture gesture = boid.getGesture();
 
-					PVector targetPosition = gesture.getViewCoordinate(gesturePoint.x, gesturePoint.y);
-//					println("Boid " + n + " at " + boid.location.x + ", " + boid.location.y + " pursuing yellowtail at " + targetPosition.x + ", " + targetPosition.y + "  based on " + gesturePoint.x + ", " + gesturePoint.y);
-					targetPosition = wrappedView.targetForWrapping(targetPosition, boid.location);
+					if (gesture.exists)
+					{
+						boid.startStrictPursuit();
+						Vec3f gesturePoint = gesture.path[gesture.nPoints - 1];
 
-//      println("  adjusted: " + targetPosition.x + ", " + targetPosition.y);
+						PVector targetPosition = gesture.getViewCoordinate(gesturePoint.x, gesturePoint.y);
+	//					println("Boid " + n + " at " + boid.location.x + ", " + boid.location.y + " pursuing yellowtail at " + targetPosition.x + ", " + targetPosition.y + "  based on " + gesturePoint.x + ", " + gesturePoint.y);
+						targetPosition = wrappedView.targetForWrapping(targetPosition, boid.location);
 
-					boid.arrive(targetPosition);
+	//      println("  adjusted: " + targetPosition.x + ", " + targetPosition.y);
+
+						boid.arrive(targetPosition);
+						boid.run();
+						boidHasGoal = true;
+					}
+				}
+
+				if (!boidHasGoal)
+				{
+					boid.stopStrictPursuit();
+
+					float closestBoidDist = -1;
+					PVector closestTargetPosition = null;
+					boolean shouldEvade = false;
+
+					// touch/bodies (TUIO)
+					for (CursorGesture cursorGesture : tuioCursorMap.values())
+					{
+						TuioCursor tcur = cursorGesture.getCursor();
+
+						// for each tuio cursor, pick objects inside the mouseAvoidScope
+						// and convert them in pursuers
+						PVector cursorPosition = new PVector(tcur.getScreenX(width), tcur.getScreenY(height));
+
+						float boidDist = dist(cursorPosition.x, cursorPosition.y, boid.location.x,
+											  boid.location.y);
+						if (closestTargetPosition == null || boidDist < closestBoidDist)
+						{
+							closestBoidDist = boidDist;
+							closestTargetPosition = cursorPosition;
+							shouldEvade = determineTuioCursorShouldEvade(tcur);
+						}
+					}
+
+					// mouse/ball
+					if (press)
+					{
+						float boidDist = dist(hitPixels.x, hitPixels.y, boid.location.x, boid.location.y);
+						if (closestTargetPosition == null || boidDist < closestBoidDist)
+						{
+							closestBoidDist = boidDist;
+							closestTargetPosition = hitPixels;
+						}
+					}
+
+					if ((closestTargetPosition != null) && (closestBoidDist > minScope) && (closestBoidDist < maxScope))
+					{
+	//					println("Boid " + n + " pursuing " + closestTargetPosition.x + ", " + closestTargetPosition.y + " at distance of " + closestBoidDist);
+						boid.timeCount = 0;
+
+						if (shouldEvade)
+							boid.evade(closestTargetPosition);
+						else
+							boid.pursue(closestTargetPosition);
+
+						if (showBoidTargetingLines)
+						{
+							// red for evade
+							if (shouldEvade)
+								stroke(255, 90, 90, 200);
+							else
+								stroke(255, 200);
+
+							noFill();
+							strokeWeight(3);
+							line(boid.location.x, boid.location.y, closestTargetPosition.x,
+								 closestTargetPosition.y);
+						}
+					} else
+					{
+						if (useWanderBehavior)
+						{
+							boid.wander();
+						}
+						else
+						{
+							boid.flock(boids);
+						}
+					}
 					boid.run();
-					boidHasGoal = true;
 				}
 			}
-			
-			if (!boidHasGoal)
+			else
 			{
-				boid.stopStrictPursuit();
-
-				float closestBoidDist = -1;
-				PVector closestTargetPosition = null;
-				boolean shouldEvade = false;
-
-				// touch/bodies (TUIO)
-				for (CursorGesture cursorGesture : tuioCursorMap.values())
-				{
-					TuioCursor tcur = cursorGesture.getCursor();
-
-					// for each tuio cursor, pick objects inside the mouseAvoidScope
-					// and convert them in pursuers
-					PVector cursorPosition = new PVector(tcur.getScreenX(width), tcur.getScreenY(height));
-
-					float boidDist = dist(cursorPosition.x, cursorPosition.y, boid.location.x,
-										  boid.location.y);
-					if (closestTargetPosition == null || boidDist < closestBoidDist)
-					{
-						closestBoidDist = boidDist;
-						closestTargetPosition = cursorPosition;
-						shouldEvade = determineTuioCursorShouldEvade(tcur);
-					}
-				}
-
-				// mouse/ball
-				if (press)
-				{
-					float boidDist = dist(hitPixels.x, hitPixels.y, boid.location.x, boid.location.y);
-					if (closestTargetPosition == null || boidDist < closestBoidDist)
-					{
-						closestBoidDist = boidDist;
-						closestTargetPosition = hitPixels;
-					}
-				}
-
-				if ((closestTargetPosition != null) && (closestBoidDist > minScope) && (closestBoidDist < maxScope))
-				{
-//					println("Boid " + n + " pursuing " + closestTargetPosition.x + ", " + closestTargetPosition.y + " at distance of " + closestBoidDist);
-					boid.timeCount = 0;
-
-					if (shouldEvade)
-						boid.evade(closestTargetPosition);
-					else
-						boid.pursue(closestTargetPosition);
-
-					if (showBoidTargetingLines)
-					{
-						// red for evade
-						if (shouldEvade)
-							stroke(255, 90, 90, 200);
-						else
-							stroke(255, 200);
-
-						noFill();
-						strokeWeight(3);
-						line(boid.location.x, boid.location.y, closestTargetPosition.x,
-							 closestTargetPosition.y);
-					}
-				} else
-				{
-					if (useWanderBehavior)
-					{
-						boid.wander();
-					}
-					else
-					{
-						boid.flock(boids);
-					}
-				}
-				boid.run();
+				boid.display();
 			}
 		}
 
@@ -365,7 +374,14 @@ public class YellowtailKoi extends PApplet implements TuioListener
 					  CURSOR_CIRCLE_DIAMETER, CURSOR_CIRCLE_DIAMETER);
 			}
 		}
-		yellowtail.draw();
+		if (shouldUpdate)
+		{
+			yellowtail.draw();
+		}
+		else
+		{
+			yellowtail.display();
+		}
 
 
 		if (press)
@@ -457,6 +473,7 @@ public class YellowtailKoi extends PApplet implements TuioListener
 						  new PVector(random(100, width - 100), random(100, height - 100)),
 						  random(BOID_SPEED_RANGE_MIN, BOID_SPEED_RANGE_MAX), BOID_MAX_FORCE,
 						  wrappedView);
+		boid.setFlagellumStructureVisible(isFlagellumStructureVisible());
 		// put the new boid at the front of the stack so that it will get picked first
 		boids.add(boid);
 		availableBoids.add(0, boid);
@@ -537,6 +554,13 @@ public class YellowtailKoi extends PApplet implements TuioListener
 		} else if (key == ']')
 		{
 			advanceOneFrame = true;
+		} else if (key == 'f')
+		{
+			setFlagellumStructureVisible(!isFlagellumStructureVisible());
+			for (Boid boid : boids)
+			{
+				boid.setFlagellumStructureVisible(isFlagellumStructureVisible());
+			}
 		}
 	}
 
@@ -632,5 +656,15 @@ public class YellowtailKoi extends PApplet implements TuioListener
 
 	public void refresh(TuioTime tuioTime)
 	{
+	}
+
+	public boolean isFlagellumStructureVisible()
+	{
+		return flagellumStructureVisible;
+	}
+
+	public void setFlagellumStructureVisible(boolean flagellumStructureVisible)
+	{
+		this.flagellumStructureVisible = flagellumStructureVisible;
 	}
 }
