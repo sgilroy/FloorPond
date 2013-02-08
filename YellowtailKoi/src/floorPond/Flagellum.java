@@ -22,20 +22,18 @@ public class Flagellum
 
 	private PImage skin;
 	private PApplet applet;
+	private String skinFileName;
 	private boolean flagellumStructureVisible = false;
+	private float scale;
+	private SkinOutline skinOutline;
 
-	Flagellum(PApplet applet, String _skin)
+	Flagellum(PApplet applet, String skinFileName)
 	{
 		this.applet = applet;
-		skin = applet.loadImage(_skin);
+		this.skinFileName = skinFileName;
 
 		// random image resize
-		float scalar = applet.random(0.75f, 1);
-		skin.resize((int)(skin.width * scalar),(int)(skin.height * scalar));
-
-		// nodes spacing
-		skinXspacing = skin.width /(float)(numNodes) + 0.5f;
-		skinYspacing = skin.height / 2;
+		setScale(applet.random(0.75f, 1));
 
 		// initialize nodes
 		for (int n = 0; n < numNodes; n++) node[n] = new Node();
@@ -43,6 +41,25 @@ public class Flagellum
 		muscleFreq = applet.random(0.06f, 0.07f);
 	}
 
+	public float getScale()
+	{
+		return scale;
+	}
+
+	public void setScale(float scale)
+	{
+		this.scale = scale;
+
+		skin = applet.loadImage(skinFileName);
+
+		skin.resize((int)(skin.width * this.scale),(int)(skin.height * this.scale));
+
+		// nodes spacing
+		skinXspacing = skin.width /(float)(numNodes - 1);
+		skinYspacing = skin.height / 2;
+
+		skinOutline = new SkinOutline(applet, skin, numNodes, skinXspacing);
+	}
 
 	void move()
 	{
@@ -67,7 +84,6 @@ public class Flagellum
 			node[n].y = node[n - 1].y + (dy * skinXspacing) / d;
 		}
 	}
-
 
 	void display()
 	{
@@ -96,15 +112,41 @@ public class Flagellum
 				dy = node[n].y - node[n - 1].y;
 			}
 			float angle = -PApplet.atan2(dy, dx);
-			float x1 = node[n].x + PApplet.sin(angle) * -skinYspacing;
-			float y1 = node[n].y + PApplet.cos(angle) * -skinYspacing;
-			float x2 = node[n].x + PApplet.sin(angle) * skinYspacing;
-			float y2 = node[n].y + PApplet.cos(angle) * skinYspacing;
+			float x1 = node[n].x + PApplet.sin(angle) * skinOutline.getVertexY(n, SkinOutline.BOTTOM);
+			float y1 = node[n].y + PApplet.cos(angle) * skinOutline.getVertexY(n, SkinOutline.BOTTOM);
+			float x2 = node[n].x + PApplet.sin(angle) * skinOutline.getVertexY(n, SkinOutline.TOP);
+			float y2 = node[n].y + PApplet.cos(angle) * skinOutline.getVertexY(n, SkinOutline.TOP);
 			float u = skinXspacing * n;
-			applet.vertex(x1, y1, u, 0);
-			applet.vertex(x2, y2, u, skin.height);
+			applet.vertex(x1, y1, u, skinOutline.getTextureCoord(n, SkinOutline.BOTTOM));
+			applet.vertex(x2, y2, u, skinOutline.getTextureCoord(n, SkinOutline.TOP));
 		}
 		applet.endShape();
+	}
+
+	/**
+	 * Normalizes an angle between 0 and PI
+	 * @param angle
+	 * @return
+	 */
+	public static float normalizeAngle(float angle)
+	{
+		if(angle < 0 || angle > Math.PI * 2)
+			return Math.abs(((float)Math.PI * 2) - Math.abs(angle));
+		else
+			return angle;
+	}
+
+	/**
+	 * Normalizes a delta between -PI and +PI
+	 * @param angle
+	 * @return
+	 */
+	public static float normalizeAngleDelta(float angle)
+	{
+		if(angle < -Math.PI || angle > Math.PI)
+			return Math.abs(((float)Math.PI * 2) - Math.abs(angle + (float)Math.PI)) - (float)Math.PI;
+		else
+			return angle;
 	}
 
 	public boolean isFlagellumStructureVisible()
@@ -115,5 +157,15 @@ public class Flagellum
 	public void setFlagellumStructureVisible(boolean flagellumStructureVisible)
 	{
 		this.flagellumStructureVisible = flagellumStructureVisible;
+	}
+
+	public boolean isOutlineIgnored()
+	{
+		return skinOutline.isOutlineIgnored();
+	}
+
+	public void setOutlineIgnored(boolean ignoreOutline)
+	{
+		skinOutline.setOutlineIgnored(ignoreOutline);
 	}
 }

@@ -110,6 +110,7 @@ public class YellowtailKoi extends PApplet implements TuioListener
 	private TextParade textParade;
 	private TwitterReader twitterReader;
 	private boolean flagellumStructureVisible;
+	private boolean outlinesIgnored;
 
 	public YellowtailKoi()
 	{
@@ -561,6 +562,25 @@ public class YellowtailKoi extends PApplet implements TuioListener
 			{
 				boid.setFlagellumStructureVisible(isFlagellumStructureVisible());
 			}
+		} else if (key == '=')
+		{
+			for (Boid boid : boids)
+			{
+				boid.setScale(boid.getScale() * 1.2f);
+			}
+		} else if (key == '-')
+		{
+			for (Boid boid : boids)
+			{
+				boid.setScale(boid.getScale() / 1.2f);
+			}
+		} else if (key == 'o')
+		{
+			setOutlinesIgnored(!isOutlinesIgnored());
+			for (Boid boid : boids)
+			{
+				boid.setOutlineIgnored(isOutlinesIgnored());
+			}
 		}
 	}
 
@@ -666,5 +686,15 @@ public class YellowtailKoi extends PApplet implements TuioListener
 	public void setFlagellumStructureVisible(boolean flagellumStructureVisible)
 	{
 		this.flagellumStructureVisible = flagellumStructureVisible;
+	}
+
+	public boolean isOutlinesIgnored()
+	{
+		return outlinesIgnored;
+	}
+
+	public void setOutlinesIgnored(boolean outlinesIgnored)
+	{
+		this.outlinesIgnored = outlinesIgnored;
 	}
 }
